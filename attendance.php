@@ -56,7 +56,7 @@ function getEventAttendanceTable($eventID)
 	INNER JOIN `event` USING (`eventID`) 
 	INNER JOIN `teammateplace` USING (`tournamenteventID`) 
 	INNER JOIN `student` USING (`studentID`) 
-	WHERE `student`.`schoolID`=$schoolID AND `student`.`active` = 1 AND `tournamentevent`.`eventID`= $eventID AND `tournament`.`notCompetition` = 1
+	WHERE `student`.`active` = 1 AND `tournamentevent`.`eventID`= $eventID AND `tournament`.`notCompetition` = 1
 	ORDER BY `student`.`last`,`student`.`first`";
 	$result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 	if($result)
@@ -158,7 +158,7 @@ $row = NULL;
 		<label for="meetingTimeOut">Meeting Time Out</label>
 		<input id="meetingTimeOut" name="meetingTimeOut" type="time">
 	</p>
-	<?=getEventAttendanceTable($schoolID, $eventID)?>
+	<?=getEventAttendanceTable($eventID)?>
 
 	<?=getAllStudents(1, $row['studentID'])?>
 	<button class="btn btn-warning" type="button" onclick="javascript:eventAttendanceAddStudent('<?=$myID?>')"><span class='bi bi-plus-circle'> Add Student</button>
@@ -189,7 +189,8 @@ $row = NULL;
 		if(confirm('Are you sure you want to submit your meeting attendance?'))
 		{
 			alert('Meeting attendance submitted!');
-			window.history.back();
+			var eventID = document.getElementById("meetingName").value;
+			window.location.href = `#event-analysis-${eventID}`;
 		}
 		else {
 			event.preventDefault();
