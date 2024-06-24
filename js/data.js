@@ -160,6 +160,11 @@ function loadpage(myPage){
 				}
 				break;
 
+				case 'meeting':
+				if(typepage=="edit"){
+					meetingEdit(myID);
+				}
+
 				case 'eventyear':
 				if(typepage=="edit"){
 					//eventyearPrepare(myID);
@@ -274,7 +279,14 @@ function studentPreparePage()
 		});
 
 		request.done(function( html ) {
-			$(".text-success").remove(); //removes any old update notices
+			$(".text-success").remove(); //removes any old update noticesfunction eventEdit(myID)
+{
+	$('#addTo :input,select').each(function() {
+		$(this).change(function(){
+			fieldUpdate(myID,'event',this.id,this.value,this.id,this.id);
+		});
+	});
+}
 			if(html>0)
 			{
 				window.location.hash = '#student-edit-'+html;
@@ -613,6 +625,25 @@ function coachEdit(myID)
 
 	request.fail(function( jqXHR, textStatus ) {
 		$("#mainContainer").html("Removal Error");
+	});
+}
+
+///////////////////
+///Meeting Edit
+//////////////////
+function meetingEdit(myID)
+{
+	$('#addTo :input,select').each(function() {
+		$(this).change(function(){
+			if((this.id).startsWith('attendance')) {
+				var studentID = ((this.id).split('-'))[1];
+				//attendancevalue is this.value
+				fieldUpdate(myID,'meetingattendance','attendance',this.value,studentID,studentID);
+			}
+			else {
+			fieldUpdate(myID,'meeting',this.id,this.value,this.id,this.id);
+			}
+		});
 	});
 }
 
