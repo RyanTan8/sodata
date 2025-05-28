@@ -17,7 +17,7 @@ while ($row = $result->fetch_assoc()):
 		{
 			$events .= "</ul>";
 		}
-		$events .= "<h2>Division ".$row['divisionID']."</h2><ul id='eventsforyear'>";
+		$events .= "<h2>Division ".$row['divisionID']."</h2><ul>";
 	}
 	$events .= "<li id='eventyear-".$row["eventyearID"]."'><span class='event'><strong>".$row["event"]."</strong> - ". getEventString($row["type"]) ."</span> <button class='btn btn-danger btn-sm' type='button' onclick='eventYearRemove(".$row["eventyearID"].")'><span class='bi bi-trash'></span> Remove</button></li>";
 	$eventDivision=$row['divisionID'];
@@ -29,17 +29,17 @@ $events .= "</ul>";
 <form id="addTo" method="post" action="eventyearadd.php">
 	<p>
 		<label for="year">Year</label>
-		<?=getSOYears($year, 0)?>
+		<?=getSOYears($year)?>
 	</p>
 	<div id="eventsP">
 		<?=$events?>
 	</div>
 	<hr>
 	<p>
-		<?=getDivisionList(0,"Division")?>
+		<?=getDivisionList($mysqlConn, 0,"Division")?>
 	</p>
 	<p>
-		<?=getEventListAll(0,"Events")?>
+		<?=getEventList($mysqlConn, 0,"Events")?>
 	</p>
 </p>
 	<button class='btn btn-outline-secondary' onclick='window.history.back()' type='button'><span class='bi bi-arrow-left-circle'></span> Return</button>

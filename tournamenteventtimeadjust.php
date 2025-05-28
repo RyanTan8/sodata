@@ -22,16 +22,6 @@ if(empty($timeblockID))
 {
 	exit("<div style='color:red'>timeblockID is not set.</div>");
 }
-$teamID = NULL;
-if($table=="tournamenttimechosen")
-	{
-		//Users should be able to remove a time chosen to pick another time.
-		$teamID = intval($_POST['teamID']);
-		if(empty($teamID))
-		{
-			exit("<div style='color:red'>Team is not set.</div>");
-		}
-}
 $checked = intval($_POST['checked']);
 if($checked)
 {
@@ -41,6 +31,11 @@ if($checked)
 	}
 	else if($table=="tournamenttimechosen")
 	{
+		$teamID = intval($_POST['teamID']);
+		if(empty($teamID))
+		{
+			exit("<div style='color:red'>Team is not set.</div>");
+		}
 		$query = "INSERT INTO `$table` (`tournamenteventID`, `timeblockID`,`teamID`) VALUES ('$tournamenteventID', '$timeblockID','$teamID');";
 	}
 	else{
@@ -51,18 +46,16 @@ else {
 	//check to see if a tournamenttimechosen has used this available time
 	if($table=="tournamenttimeavailable")
 	{
-		if(!tournamentTimeChosenEmpty($tournamenteventID, $timeblockID))
+		if(!tournamentTimeChosenEmpty($mysqlConn, $tournamenteventID, $timeblockID))
 		{
 			exit("There is a timeblock chosen for a team for this event.  You must unselect the time before removing the event.");
 		}
-		$query = "DELETE FROM `$table` WHERE `tournamenteventID` = '$tournamenteventID' AND `timeblockID` = '$timeblockID';";
 	}
 	else if($table=="tournamenttimechosen")
 	{
-		//Users remove a time chosen to pick another time.
-		$query = "DELETE FROM `$table` WHERE `tournamenteventID` = '$tournamenteventID' AND `timeblockID` = '$timeblockID' AND `teamID` = '$teamID';";
+		//Users should be able to remove a time chosen to pick another time.
 	}
-		
+		$query = "DELETE FROM `$table` WHERE `tournamenteventID` = '$tournamenteventID' AND `timeblockID` = '$timeblockID';";
 }
 $result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 if ($result)

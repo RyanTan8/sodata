@@ -15,9 +15,8 @@ if(empty($teamID))
 
 
 //find students and order by best score for event (not average best score)
-function makeStudentArrayTopScore($thisYear, $teamID, $schoolID)
+function makeStudentArrayTopScore($db, $thisYear, $teamID)
 {
-	global $mysqlConn;
 	$whereClause = "";
 	if($thisYear)
 	{
@@ -37,11 +36,11 @@ function makeStudentArrayTopScore($thisYear, $teamID, $schoolID)
 		AND `score` IS NOT NULL
 		GROUP BY `teammate`.`studentID`,`tournamentevent`.`eventID`
 		ORDER BY note DESC";
-	$result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
+	$result = $db->query($query) or error_log("\n<br />Warning: query failed:$query. " . $db->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 	while($row = $result->fetch_assoc()):
 		array_push($rows, $row);
 	endwhile;
 	return $rows;
 }
 
-print json_encode(makeStudentArrayTopScore($thisYear, $teamID, $schoolID));
+print json_encode(makeStudentArrayTopScore($mysqlConn, $thisYear, $teamID));

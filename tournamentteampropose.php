@@ -1,6 +1,7 @@
 <?php
 require_once  ("php/functions.php");
 userCheckPrivilege(3);
+$schoolID =$_SESSION['userData']['schoolID'] ;
 
 $output = "";
 $teamID = intval($_POST['myID']);
@@ -15,8 +16,8 @@ $resultTeam = $mysqlConn->query($query) or error_log("\n<br />Warning: query fai
 $rowTeam = $resultTeam->fetch_assoc();
 
 
-//$timeblocks = makeTimeArray($rowTeam['tournamentID']);
-//$events = getEventsTable();
+//$timeblocks = makeTimeArray($mysqlConn, $rowTeam['tournamentID']);
+//$events = getEventsTable($mysqlConn);
 
 echo "<h2><span id='myTitle'>".$rowTeam['tournamentName'].": ".$rowTeam['teamName']."</span></h2><div id='note'></div>";
 

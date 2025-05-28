@@ -24,7 +24,7 @@
 </p>
 <p>
 	<label for="year">Competition Year (National Rules Year)</label>
-	<?=getSOYears($row['year']?$row['year']:getCurrentSOYear(),0)?>
+	<?=getSOYears($row['year']?$row['year']:getCurrentSOYear())?>
 </p>
 <p>
 	<label for="type">Type of Competition</label>
@@ -45,6 +45,10 @@
 <p>
 	<label for="teamsAttended">Number of Teams from All Schools Registered</label>
 	<input id="teamsAttended" name="teamsAttended" class="form-control" type="number" min='0' value="<?=$row['teamsAttended']?>">
+</p>
+<p>
+	<label for="note">Note(s)</label>
+	<input id="note" name="note" class="form-control" type="text" value="<?=$row['note']?>">
 </p>
 <p>
 	<label for="websiteHost">Host's Website</label>
@@ -69,12 +73,4 @@
 <p>
 	<label for="addressBilling">Address Billing</label>
 	<input id="addressBilling" name="addressBilling" class="form-control" type="text" value="<?=$row['addressBilling']?>">
-</p>
-<p>
-	<label for="note">Note(s)</label>
-	<textarea id="note" name="note" class="form-control" data-summernote><?=$row['note']?></textarea>
-</p>
-<p>
-	<label for="resultsLink">Results Link (Prefer Duosmium or Secondly Drive Link)</label>
-	<input id="resultsLink" name="resultsLink" class="form-control" type="text" value="<?=$row['resultsLink']?>">
 </p>

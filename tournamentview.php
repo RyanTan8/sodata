@@ -4,11 +4,10 @@ userCheckPrivilege(1);
 $schoolID =$_SESSION['userData']['schoolID'] ;
 
 
-function assignmentMade($teamID)
+function assignmentMade($db, $teamID)
 {
-	global $mysqlConn;
 	$query = "SELECT * from `teammateplace` WHERE `teammateplace`.`teamID` = $teamID";
-	$result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
+	$result = $db->query($query) or error_log("\n<br />Warning: query failed:$query. " . $db->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 	if(empty($result))
 	{
 		return 0;
@@ -31,7 +30,7 @@ if(empty($result))
 $row = $result->fetch_assoc();
 $numberTeams = $row["numberTeams"];
 $userID = $_SESSION['userData']['userID'];
-$studentID = getStudentID($userID);
+$studentID = getStudentID($mysqlConn,$userID);
 
 //Get number of teams created
 $query = "SELECT * FROM `team` WHERE `tournamentID` = $tournamentID ORDER BY `teamName`";
@@ -44,9 +43,9 @@ $output .="<div>";
 	$published = intval($row['published']);
 	 $output .="<div id='myTitle'>".$row['tournamentName']." - " . $row['year'] . "</div>";
 
-	 	$output .="<div class='btn-group' role='group' aria-label='Top Buttons'>";
 		if(userHasPrivilege(3))
 		{
+			$output .="<div>";
 			//tournament edit button -> changes hash to tournament-edit-tournamentID
 			if(userHasPrivilege(5))
 			{
@@ -68,14 +67,8 @@ $output .="<div>";
 			$output .=" <a class='btn btn-secondary' role='button' href='#tournament-times-".$row['tournamentID']."'><span class='bi bi-clock-history'></span> Time Blocks</a>";
 			$output .=" <a class='btn btn-secondary' role='button' href='#tournament-events-".$row['tournamentID']."'><span class='bi bi-puzzle'></span> Events</a>";
 			$output .=" <a class='btn btn-secondary' role='button' href='#tournament-eventtime-".$row['tournamentID']."'><span class='bi bi-clock'></span> Choose Times</a>";
+			$output .="</div><br>";
 		}
-
-		if(!$row['notCompetition'] && $row['dateTournament']<=date("Y-m-d") && isset($row['resultsLink']))
-		{
-			//there are no results for a team assignment, so this is only shown for a real tournament
-			$output .=" <a class='btn btn-primary' role='button' href='".$row['resultsLink']."'><span class='bi bi-trophy'></span> Results</a>";
-		}
-		$output .="</div>";
 
 		if(!$row['notCompetition'])
 		{
@@ -159,35 +152,28 @@ $output .="<div>";
 		}
 		if($studentID)
 		{
-			$heading ="My Schedule (Team ".getStudentTeam($tournamentID, $studentID).")";
-			$output.=studentTournamentSchedule($tournamentID, $studentID, $heading, $row['year']);
+			$heading ="My Schedule (Team ".getStudentTeam($mysqlConn, $tournamentID, $studentID).")";
+			$output.=studentTournamentSchedule($mysqlConn, $tournamentID, $studentID, $heading);
 		}
 
 		if(userHasPrivilege(5) || $published)
 		{
 		while($rowTeam = $resultTeams->fetch_assoc()):
 			$output .="<h2>Team ".$rowTeam['teamName'];
-			if ($row["dateTournament"]<=getCurrentTimestamp())
+			if ($row["dateTournament"]<=getCurrentTimestamp($mysqlConn))
 	 		{
-				$output .=" - " . ordinal($rowTeam['teamPlace']).teamCalculateScoreStr($rowTeam['teamID']);
+				$output .=" - " . ordinal($rowTeam['teamPlace']).teamCalculateScoreStr($mysqlConn, $rowTeam['teamID']);
 			}
 			$output .= "</h2>";
 			$output .="<p><div class='btn-group' role='group' aria-label='Team Buttons'>";
 			if(userHasPrivilege(3))
 			{
-				if(userHasPrivilege(4)||!$rowTeam['locked'])
+				$output .="<a class='btn btn-primary' role='button' href='#tournament-teamedit-".$rowTeam['teamID']."' data-toggle='tooltip' data-placement='top' title='Edit Team ".$rowTeam['teamName'] ."'><span class='bi bi-pencil-square'></span> Edit</a>";
+				if(!assignmentMade($mysqlConn, $rowTeam['teamID'])||userHasPrivilege(4))
 				{
-					$output .="<a class='btn btn-primary' role='button' href='#tournament-teamedit-".$rowTeam['teamID']."' data-toggle='tooltip' data-placement='top' title='Edit Team ".$rowTeam['teamName'] ."'><span class='bi bi-pencil-square'></span> Edit</a>";
-					if(!assignmentMade($rowTeam['teamID'])&&userHasPrivilege(4))
-					{
 						$output .=" <a class='btn btn-info' role='button' href='#tournament-teampropose-".$rowTeam['teamID']."' data-toggle='tooltip' data-placement='top' title='Possible team assignments'><span class='bi bi-tornado'></span> Propose</a>";
-					}
-					$output .=" <a class='btn btn-primary' role='button' href='#tournament-teamassign-".$rowTeam['teamID']."' data-toggle='tooltip' data-placement='top' title='Assign events to team ".$rowTeam['teamName'] ."'><span class='bi bi-clipboard-plus'></span> Assign</a>";
 				}
-				else
-				{
-					$output .=" <a class='btn btn-primary' role='button' href='#tournament-teamassign-".$rowTeam['teamID']."' data-toggle='tooltip' data-placement='top' title='View events to team ".$rowTeam['teamName'] ."'><span class='bi bi-clipboard-plus'></span> View</a>";
-				}
+				$output .=" <a class='btn btn-primary' role='button' href='#tournament-teamassign-".$rowTeam['teamID']."' data-toggle='tooltip' data-placement='top' title='Assign events to team ".$rowTeam['teamName'] ."'><span class='bi bi-clipboard-plus'></span> Assign</a>";
 				$output .=" <a class='btn btn-secondary' role='button' href='#team-emails-".$rowTeam['teamID']."' data-toggle='tooltip' data-placement='top' title='Get team ".$rowTeam['teamName'] ." emails'><span class='bi bi-envelope'></span> Email</a>";
 			}
 			else {
@@ -199,12 +185,12 @@ $output .="<div>";
 		}
 
 
-		if(!$row['notCompetition'] && userHasPrivilege(5)&&$row['dateTournament']<=date('Y-m-d'))
+		if(!$row['notCompetition'] && userHasPrivilege(5))
 		{
 			$output .= $rowTeam['notCompetition'];
 			//there are no results for a team assignment, so this is only shown for a real tournament
 			$output .="<h2>Tournament Results</h2>";
-			$output .="<p><a class='btn btn-dark' role='button' href='#tournament-score-$tournamentID'  data-toggle='tooltip' data-placement='top' title='View scores for teammates'><span class='bi bi-bar-chart'></span> Scores</a></p>";
+			$output .="<p><a class='btn btn-dark' role='button' href='#tournament-score-$tournamentID'  data-toggle='tooltip' data-placement='top' title='View scores for teammates'><span class='bi bi-chart-line'></span> Scores</a></p>";
 		}
 	}
 	$output .="</div>";

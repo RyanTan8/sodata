@@ -1,8 +1,6 @@
 <?php
 require_once ("php/functions.php");
 userCheckPrivilege(1);
-$schoolID = $_SESSION['userData']['schoolID'];
-
 ?>
 <div>
 	<button class="btn btn-secondary" type="button" onclick="javascript:toggleSearch()"><span class='bi bi-search'></span> Find</button> <!-- toggles view of below div -->
@@ -31,7 +29,7 @@ $schoolID = $_SESSION['userData']['schoolID'];
 	<!--Output parent emails -->
 	<a class="btn btn-secondary" role="button" href="#parent-emails-<?=getCurrentSOYear();?>"><span class='bi bi-envelope-heart'></span> Get Parents</a>
 	<a class="btn btn-secondary" role="button" href="studentfile.php"><span class='bi bi-archive'></span> Students File</a>
-	<a class="btn btn-secondary" role="button" href="#awards"><span class='bi bi-archive'></span> Awards List</a>
+	<a class="btn btn-secondary" role="button" href="awards.php"><span class='bi bi-archive'></span> Awards List</a>
 	<?php }?>
 <br><br>
 	<form id="searchDb">

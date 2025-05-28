@@ -2,14 +2,12 @@
 require_once  ("php/functions.php");
 userCheckPrivilege(5);
 require_once  ("php/functionstournament.php");
-
 //calculation of score
 // SUM(eventweighting/eventplacement^3) * tournamentWeight
 //With this method number of events is weighted.
 
 $output = "";
 $tournamentID = intval($_POST['myID']);
-$year = getTournamentYear($tournamentID);
 $returnBtn = "<button class='btn btn-outline-secondary' onclick='window.history.back()' type='button'><span class='bi bi-arrow-left-circle'></span> Return</button>";
 
 if(empty($tournamentID))
@@ -17,13 +15,13 @@ if(empty($tournamentID))
 	echo "<div style='color:red'>teamID is not set.</div>";
 	exit();
 }
-$output .="<h2>".getTournamentName($tournamentID)."</h2>";
+$output .="<h2>".getTournamentName($mysqlConn, $tournamentID)."</h2>";
 $output .="<h3>Tournament Teammate Placement and Score</h3>";
 $output .="<p class='text-warning'>This page is a beta version and calculations are likely to change.</p>";
 //scores are calculated in functionstournament
 $output .="<p class='text-warning'>Current Formula for = (tournamentWeight-((eventPlace-1)*(tournamentWeight/(teamsAttended/4))))*eventWeight/100</p>";
 //check to see if this tournament has placements
-if(!checkPlacements($tournamentID))
+if(!checkPlacements($mysqlConn, $tournamentID))
 {
 	if(userHasPrivilege(3))
 	{
@@ -37,30 +35,34 @@ if(!checkPlacements($tournamentID))
 }
 else
 {
-	$tournamentPlacements = getPlacements($tournamentID);
+	$tournamentPlacements = getPlacements($mysqlConn, $tournamentID);
 	//print_r ($tournamentPlacements);
-	$events = getEvents($tournamentID);
+	$events = getEvents($mysqlConn, $tournamentID);
 	//print_r ($events);
-	$students = getStudents($tournamentID);
+	$students = getStudents($mysqlConn, $tournamentID);
 	//print_r ($students);
-	$tallyPlaces = [0,0,0,0,0,0];
 
-	$tournamentWeight = getTournamentWeight($tournamentID);
-	$teamsAttended = getTournamentTeamsAttended($tournamentID);
+	$tournamentWeight = getTournamentWeight($mysqlConn, $tournamentID);
+	$teamsAttended = getTournamentTeamsAttended($mysqlConn, $tournamentID);
 	calculateScores($students, $tournamentPlacements, $events, $tournamentWeight, $teamsAttended);
 	calculateTeamRanking($students);
 	//$output .="<div><span id='notification'></span></div>";
 	$output .="<form id='addTo' method='post' action='tournamentscoresave.php'><table id='tournamentTable' class='tournament table table-hover'>";
-	$output .="<p>Tournament Weight: $tournamentWeight</p>";
-	$output .="<p>Teams Attended: $teamsAttended</p>";
 	if(userHasPrivilege(4))
 	{
-		$output .="<ul><li>Edit tournament weight and teams attended on the Tournament Edit Information Page</li>";
-		$output .="<li>Event Weighting equal to 100 means all teams participated and the event was run with full rules. 
-		Lower event weight indicates that the full rules or full number of teams did not participate.</li></ul>";
+		$output .="<div><label for='tournamentWeight' style='display: inline-block'>Tournament Weight</label>";
+		$output .="  <input id='tournamentWeight' type='number' class='form-control' min='0' max='999' value='".$tournamentWeight."' style='display: inline-block'/></div>";
+		$output .="<div><label for='teamsAttended' style='display: inline-block'>Teams Attended</label>";
+		$output .="  <input id='teamsAttended' type='number' class='form-control' min='0' max='999' value='".$teamsAttended."' style='display: inline-block'/></div>";
+	}
+	else
+	{
+		$output .="<p>Tournament Weight: $tournamentWeight</p>";
+		$output .="<p>Teams Attended: $teamsAttended</p>";
 	}
 
 	$output .="<p><input type='checkbox' id='showPoints' name='showPoints' checked><label for='showPoints'>Show Points</label></p>";
+		$output .="<p>Event Weighting equal to 100 means all teams participated and the event was run with full rules. Lower event weight indicates that the full rules or full number of teams did not participate.</p>";
 	$output .="<colgroup><col span='2'>";
 	foreach ($events as $i=>$event)
 	{
@@ -98,7 +100,7 @@ else
 	//list all the students and their events and score
 	foreach ($students as $student)
 	{
-		$grade = getStudentGrade($student['yearGraduating'], $year);
+		$grade = getStudentGrade($student['yearGraduating']);
 		$averagePlace = $student['avgPlace']?number_format($student['avgPlace'],2):"";
 		$totalScore = $student['score']?number_format($student['score'],2):0;
 		$output .="<tr studentLast='".removeParenthesisText($student['last'])."'  studentFirst='".removeParenthesisText($student['first'])."' grade='$grade' count='".$student['count']."' average='$averagePlace' score='$totalScore' rank='".$student['rank']."'>";
@@ -114,7 +116,6 @@ else
 				if ($studentEvent['tournamenteventID']==$event['tournamenteventID'])
 				{
 					$placement = $studentEvent['place'];
-					$tallyPlaces = tallyPlacements($placement,$tallyPlaces); //add placement for each student
 					$score = $studentEvent['score'];
 					$scoreprint = $score ? "(".number_format($score,2).")":"";
 					break;
@@ -126,10 +127,6 @@ else
 	}
 	$output .= "</tbody><table>";
 
-	// Create a table for tally of places
-	$output .= tallyPlacementsPrint($tallyPlaces, "Team Members");
-
-	// Save function
 	$output .= "<p>" . $returnBtn;
 	if(userHasPrivilege(4))
 	{

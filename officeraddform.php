@@ -11,11 +11,11 @@ if(empty($year))
 <form id="addTo" method="post" action="javascript:addToSubmit('officeradd.php')">
 	<p>
 		<label for="year">Year</label>
-		<?=getSOYears($year, 0)?>
+		<?=getSOYears($year)?>
 	</p>
 	<p id="eventsP">
 		<label for="student">Student</label>
-		<?=getAllStudents(1, NULL)?>
+		<?=getAllStudents($mysqlConn,1, NULL)?>
 	</p>
 	<p>
 		<label for="position">Assign Position</label>

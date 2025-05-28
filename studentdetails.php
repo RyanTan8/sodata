@@ -1,10 +1,9 @@
 <?php
 require_once("php/functions.php");
 userCheckPrivilege(1);
-$schoolID = $_SESSION['userData']['schoolID'];
-$myStudentID = getStudentID($_SESSION['userData']['userID']);
+
+$myStudentID = getStudentID($mysqlConn, $_SESSION['userData']['userID']);
 $studentID = isset($_REQUEST['myID'])?intval($_REQUEST['myID']):0;
-$year = getCurrentSOYear();
 $query = "SELECT * FROM `student` WHERE `studentID` = $studentID";
 $result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 if($result)
@@ -13,13 +12,12 @@ if($result)
 
 $output ="<div id='student-$studentID'>";
 $output .="<h2>".$row['last'] . ", " . $row['first']."</h2>";
-$officerPos = getOfficerPosition($studentID);
+$officerPos = getOfficerPosition($mysqlConn,$studentID);
 if($officerPos)
 {
 	$output .="<h3>Officer: $officerPos</h3>";
 }
-
-$eventLeaderPos = getEventsText(getEventLeaderPosition($row['studentID'],$year));
+$eventLeaderPos = getEventLeaderPosition($mysqlConn,$studentID, getCurrentSOYear());
 if($eventLeaderPos)
 {
 	$output .="<h3>Leading Event(s): $eventLeaderPos</h3>";
@@ -59,18 +57,18 @@ if(userHasPrivilege(3))
 }
 if(userHasPrivilege(4)||$studentID==$myStudentID)
 {
-	$output .= "<div>School Name: ".getCurrentSchoolName($row['schoolID'])."</div>";
+	$output .= "<div>School Name: ".getCurrentSchoolName($mysqlConn,$row['schoolID'])."</div>";
 	$output .= "<div>Student's School ID: ".$row['studentschoolID']."</div>";
 	$output .= "<div>Scilympiad ID: ".$row['scilympiadID']."</div>";
 }
-$output .="<div>".getStudentGradeGraduate($row['yearGraduating'])."</div>";
+$output .="<div>Grade: ".getStudentGrade($row['yearGraduating'])." (".$row['yearGraduating'].")</div>";
 if($row['email'])
 {
-	$output .="<div>Google Email: <a href='mailto:".$row['email']."'>".$row['email']."</a></div>";
+	$output .="<div>Google Email: <a href='mailto: ".$row['email']."'>".$row['email']."</a></div>";
 }
 if($row['emailSchool'])
 {
-	$output .="<div>School Email: <a href='mailto:".$row['emailSchool']."'>".$row['emailSchool']."</a></div>";
+	$output .="<div>School Email: <a href='mailto: ".$row['emailSchool']."'>".$row['emailSchool']."</a></div>";
 }
 if($row['phone'])
 {
@@ -80,12 +78,12 @@ if($row['phone'])
 
 if(userHasPrivilege(3)||$studentID==$myStudentID)
 {
-	$officerPosPrev = getOfficerPositionPrevious($studentID);
+	$officerPosPrev = getOfficerPositionPrevious($mysqlConn,$studentID);
 	if($officerPosPrev)
 	{
 		$output .="<div>Previous Positions: $officerPosPrev</div>";
 	}
-	$eventLeaderPosPrev = getEventLeaderPositionPrevious($studentID, $year);
+	$eventLeaderPosPrev = getEventLeaderPositionPrevious($mysqlConn,$studentID,"");
 	if($eventLeaderPosPrev)
 	{
 		$output .="<div>Previous Event(s) Lead: $eventLeaderPosPrev</div>";
@@ -102,12 +100,12 @@ if(userHasPrivilege(3)||$studentID==$myStudentID)
 	}
 	$output .= "<hr>";
 	//Get latest team assignments
-	$output .=getLatestTeamTournamentStudent($studentID);
-	$output .=studentEventPriority($studentID);
-	$output .=studentCourseCompleted($studentID);
-	$output .=studentCourseEnrolled($studentID);
-	$output .=studentAwards($studentID);
-	$output .=studentTournamentResultsList($studentID, true);
+	$output .=getLatestTeamTournamentStudent($mysqlConn, $studentID);
+	$output .=studentEventPriority($mysqlConn, $studentID);
+	$output .=studentCourseCompleted($mysqlConn, $studentID);
+	$output .=studentCourseEnrolled($mysqlConn, $studentID);
+	$output .=studentAwards($mysqlConn, $studentID);
+	$output .=studentTournamentResults($mysqlConn, $studentID, true);
 }
 
 

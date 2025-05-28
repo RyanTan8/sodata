@@ -1,7 +1,6 @@
 <?php
 require_once  ("php/functions.php");
 userCheckPrivilege(1);
-$schoolID = $_SESSION['userData']['schoolID'];
 
 //text output
 $output = "";
@@ -89,15 +88,18 @@ if($result)
 		{
 			$output .="<a class='btn btn-primary' role='button' href='#student-details-".$row['studentID']."'><span class='bi bi-journal'></span> Details</a> ";
 		}
-		$output .=userHasPrivilege(4)?"<a class='btn btn-warning' role='button' href='#student-edit-".$row['studentID']."'><span class='bi bi-pencil-square'></span> Edit</a>":"";
+		if(userHasPrivilege(4)) //||$_SESSION['userData']['id']==$row['userID']) //Users cannot edit their own information
+		{
+			$output .="<a class='btn btn-warning' role='button' href='#student-edit-".$row['studentID']."'><span class='bi bi-pencil-square'></span> Edit</a>";
+		}
 		$output .= userHasPrivilege(5)?" <a class='btn btn-danger btn-sm' role='button' href='javascript:studentRemove(" . $row['studentID'] . ",\"" . $row['first']." ".$row['last'] . "\")'><span class='bi bi-eraser'></span> Remove</a>":"";
 		$output .= "</div>";
-		$officerPos = getOfficerPosition($row['studentID']);
+		$officerPos = getOfficerPosition($mysqlConn,$row['studentID']);
 		if($officerPos)
 		{
 			$output .="<h4>Officer: $officerPos</h4>";
 		}
-		$eventLeaderPos = getEventsText(getEventLeaderPosition($row['studentID'],$year));
+		$eventLeaderPos = getEventLeaderPosition($mysqlConn,$row['studentID'],$year);
 		if($eventLeaderPos)
 		{
 			$output .="<h4>Leading Event(s): $eventLeaderPos</h4>";
@@ -126,14 +128,14 @@ if($result)
 				}
 			}
 		}
-		$output .="<div>".getStudentGradeGraduate($row['yearGraduating'])."</div>";
+		$output .="<div>Grade: ".getStudentGrade($row['yearGraduating'])." (".$row['yearGraduating'].")</div>";
 		if($row['email'])
 		{
-			$output .="<div>Google Email: <a href='mailto:".$row['email']."'>".$row['email']."</a></div>";
+			$output .="<div>Google Email: <a href='mailto: ".$row['email']."'>".$row['email']."</a></div>";
 		}
 		if($row['emailSchool'])
 		{
-			$output .="<div>School Email: <a href='mailto:".$row['emailSchool']."'>".$row['emailSchool']."</a></div>";
+			$output .="<div>School Email: <a href='mailto: ".$row['emailSchool']."'>".$row['emailSchool']."</a></div>";
 		}
 		if($row['phone'])
 		{

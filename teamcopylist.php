@@ -1,25 +1,20 @@
 <?php
 header("Content-Type: text/plain");
 require_once  ("php/functions.php");
-userCheckPrivilege(2);
+userCheckPrivilege(3);
 
 
-function getTeamStudents($teamID)
+function getTeamStudentIDs($db, $teamID)
 {
-	global $mysqlConn;
-	$query = "SELECT `teammate`.`studentID`, `student`.`last`, `student`.`first` FROM `team` 
-		INNER JOIN `teammate` ON `team`.`teamID` = `teammate`.`teamID` 
-		INNER JOIN `student` ON `teammate`.`studentID` = `student`.`studentID` 
-		WHERE `team`.`teamID` = $teamID";
-	$result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
+	$query = "SELECT `studentID` FROM `team` INNER JOIN `teammate` ON `team`.`teamID`=`teammate`.`teamID` WHERE `team`.`teamID`= $teamID";
+	$result = $db->query($query) or error_log("\n<br />Warning: query failed:$query. " . $db->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 	if($result && mysqli_num_rows($result)>0)
 	{
-		$students = [];
+		$studentIDs = [];
 		while ($row = $result->fetch_assoc()):
-			$student = ["studentID"=>$row["studentID"],"last"=>$row["last"],"first"=>$row["first"]];
-			array_push($students, $student);
+			array_push($studentIDs, $row["studentID"]);
 		endwhile;
-		return $students;
+		return $studentIDs;
 	}
 	else {
 		return 0;
@@ -27,5 +22,5 @@ function getTeamStudents($teamID)
 }
 
 $teamID = intval($_POST['myID']);
-echo json_encode(getTeamStudents($teamID));
+echo json_encode(getTeamStudentIDs($mysqlConn, $teamID));
 ?>

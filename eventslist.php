@@ -2,11 +2,10 @@
 require_once  ("php/functions.php");
 userCheckPrivilege(1);
 
-function getEventYears($eventID)
+function getEventYears($db, $eventID)
 {
-	global $mysqlConn;
 	$query = "SELECT * FROM `eventyear` WHERE `eventID`=$eventID ORDER BY `divisionID` AND `year`";
-	$result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
+	$result = $db->query($query) or error_log("\n<br />Warning: query failed:$query. " . $db->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 	if($result && $result->num_rows>0){
 		$output = "<div>";
 		$years = "";
@@ -36,16 +35,15 @@ function getEventYears($eventID)
 
 
 //Get the current event Leader for this school of this event during the selected year
-function getEventLeader($eventID, $year)
+function getEventLeader($db, $eventID, $year, $schoolID)
 {
-	global $mysqlConn, $schoolID;
 	$yearWhere = "";
 	if($year)
 	{
 		$yearWhere = "AND `eventleader`.`year` = $year";
 	}
 	$query = "SELECT `student`.`studentID`, `first`, `last`, `year`, `eventleaderID` from `eventleader` INNER JOIN `student` ON `eventleader`.`studentID` = `student`.`studentID`  WHERE `schoolID` = $schoolID AND `eventleader`.`eventID` = $eventID $yearWhere";
-	$result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
+	$result = $db->query($query) or error_log("\n<br />Warning: query failed:$query. " . $db->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 	$output = "";
 	$leaderNumber = 0;
 	if($result && $result->num_rows>0){
@@ -91,7 +89,7 @@ if($year) //if another year is set narrow search
 	$yearWhere = "AND `year` = '$year'";
 }
 
-$divisionID = isset($_POST["division"])?$mysqlConn->real_escape_string($_POST['division']):getCurrentSchoolDivision();
+$divisionID = isset($_POST["division"])?$mysqlConn->real_escape_string($_POST['division']):getCurrentSchoolDivision($mysqlConn);
 $divisionWhere = ""; //the division is  0, so show all divisions
 if($divisionID) //if another division is set narrow search
 {
@@ -123,7 +121,7 @@ if($result&& $result->num_rows>0)
 		{
 			$output .="<a class='btn btn-primary' role='button' href='#event-edit-".$row['eventID']."' data-toggle='tooltip' data-placement='top' title='Edit'><span class='bi bi-pencil-square'></span></a>";
 		}
-		if(userHasPrivilege(3) || getEventLeaderThisEvent(getStudentID($_SESSION['userData']['userID']),$year,$row['eventID']))
+		if(userHasPrivilege(3) )
 		{
 			$output .=" <a class='btn btn-primary' role='button' href='#event-analysis-".$row['eventID']."' data-toggle='tooltip' data-placement='top' title='Analysis'><span class='bi bi-pie-chart-fill'></span></a>";
 		}
@@ -134,8 +132,8 @@ if($result&& $result->num_rows>0)
 		$output .="</div>"; //end button group
 
 		//$yearCollection = $yearCollection?$yearCollection:"Trial Event";
-		$output .=getEventLeader($row['eventID'], $year, $_SESSION['userData']['schoolID'] );
-		$output .=getEventYears($row['eventID']);
+		$output .=getEventLeader($mysqlConn, $row['eventID'], $year, $_SESSION['userData']['schoolID'] );
+		$output .=getEventYears($mysqlConn, $row['eventID']);
 		$output .="<div>Type: ".getEventString($row['type'])."</div>";
 		if($row['calculatorType']){
 			$output .="<div>Calculator: ".getCalulatorString($row['calculatorType'])."</div>";

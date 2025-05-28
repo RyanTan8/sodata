@@ -1,9 +1,8 @@
-//TODO: FIX ME
 <?php
 require_once  ("php/functions.php");
 userCheckPrivilege(3);
 
-$eventID = intval($_POST['myID']);
+$awardID = intval($_POST['awardID']);
 $typeName = "";
 if(isset($eventID))
 {

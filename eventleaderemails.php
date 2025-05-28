@@ -2,9 +2,10 @@
 require_once  ("php/functions.php");
 
 userCheckPrivilege(3);
+$schoolID = $_SESSION['userData']['schoolID'];
 $eventID = intval($_POST['myID']);
 $year = getCurrentSOYear();
-$studentID = getStudentID($_SESSION['userData']['userID']);
+$studentID = getStudentID($mysqlConn, $_SESSION['userData']['userID']);
 $studentIDWhere = "";
 
 if($studentID)
@@ -15,7 +16,7 @@ $query = "SELECT DISTINCT `first`, `last`, `email`, `emailSchool`, `event`.`even
 FROM `eventleader` 
 INNER JOIN `student` ON `eventleader`.`studentID`= `student`.`studentID` 
 INNER JOIN `event` ON `eventleader`.`eventID`=`event`.`eventID`
-WHERE `student`.`active` $studentIDWhere AND `student`.`schoolID` = $schoolID AND `year`=$year
+WHERE `student`.`active` AND `student`.`userID` != 9 AND `student`.`schoolID` = $schoolID AND `year`=$year
 ORDER BY `student`.`last`, `student`.`first`";
 $result = $mysqlConn->query($query);
 $emails[] = NULL;
@@ -31,8 +32,8 @@ while ($row = $result->fetch_assoc()) {
     $output .= "<tr>";
     $output .= "<td>" . $row["first"] . " " . $row["last"] . "</td>";
     $output .= "<td>" . $row["event"] . "</td>";
-    $output .= "<td><a href='mailto:".$row['email']."'>".$row['email']."</a></td>";
-    $output .= "<td><a href='mailto:".$row['emailSchool']."'>".$row['emailSchool']."</a></td>";
+    $output .= "<td><a href='mailto: ".$row['email']."'>".$row['email']."</a></td>";
+    $output .= "<td><a href='mailto: ".$row['emailSchool']."'>".$row['emailSchool']."</a></td>";
     $output .= "</tr>";
 
     $emails[] = $row['email'];
@@ -42,8 +43,8 @@ if(userHasPrivilege(3))
 {
     $output.="<tr>";
 	$output.="<td>Total</td>";
-	$emailList = implode(';', array_filter($emails)); //array_filter removes null values
-	$schoolEmailList= implode(';', array_filter($schoolEmails)); //array_filter removes null values
+	$emailList = implode(';', $emails);
+	$schoolEmailList= implode(';', $schoolEmails);
 }
 $output .= "<td></td>";
 $output .= "<td><p><button class='btn btn-primary' onclick='copyToClipboard(\"" . $emailList . "\")' type='button'><span class='bi bi-clipboard-plus'></span> Copy student emails</button></p></td>";

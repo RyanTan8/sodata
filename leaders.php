@@ -1,10 +1,11 @@
 <?php
 require_once  ("php/functions.php");
 userCheckPrivilege(1);
+
 $year = isset($_POST['myID'])?intval($_POST['myID']):getCurrentSOYear();
 
 //text output
-$output = "<div>" . getSOYears($year, 0) . "</div>";
+$output = "<div>" . getSOYears($year) . "</div>";
 $output .= "<br></br><h2>Coaches</h2><div>";
 
 $query = "SELECT * FROM `coach` WHERE `schoolID` = " . $_SESSION['userData']['schoolID'];
@@ -26,7 +27,7 @@ if($result)
 		}
 		if($row['emailSchool'])
 		{
-			$output .="<div>Email: <a href='mailto:".$row['emailSchool']."'>".$row['emailSchool']."</a></div>";
+			$output .="<div>Email: <a href='mailto: ".$row['emailSchool']."'>".$row['emailSchool']."</a></div>";
 		}
 	endwhile;
 	$output .="</div>";
@@ -50,10 +51,6 @@ if($result)
 	{
 		$output .=" <a class='btn btn-primary' role='button' href='#officer-addform-$year'><span class='bi bi-plus-circle'></span> Add Officer</a>";
 	}
-	if(userHasPrivilege(3))
-	{
-		$output .= " <a class='btn btn-primary' role='button' href='#attendance'><span class='bi bi-people'></span> Officer Meeting or General Meeting Attendance</a>";
-	}
 		$output .='</div><div>';
 	while ($row = $result->fetch_assoc()):
 		$output .="<hr><div id='officer-".$row['officerID']."'>";
@@ -64,14 +61,14 @@ if($result)
 		{
 			$output .="<a class='btn btn-danger btn-sm' role='button' href='javascript:officerRemove(\"".$row['officerID']."\",\"$leaderName\")''><span class='bi bi-eraser'></span> Remove</a>";
 		}
-		$output .="<div>Grade: ".getStudentGrade($row['yearGraduating'], $year)." (".$row['yearGraduating'].")</div>";
+		$output .="<div>Grade: ".getStudentGrade($row['yearGraduating'])." (".$row['yearGraduating'].")</div>";
 		if($row['email'])
 		{
-			$output .="<div>Email: <a href='mailto:".$row['email']."'>".$row['email']."</a></div>";
+			$output .="<div>Google Email:".$row['email']."</div>";
 		}
 		if($row['emailSchool'])
 		{
-			$output .="<div>School Email: <a href='mailto:".$row['emailSchool']."'>".$row['emailSchool']."</a></div>";
+			$output .="<div>School Email:".$row['emailSchool']."</div>";
 		}
 		if($row['phone'])
 		{
@@ -108,14 +105,14 @@ if($result)
 		{
 			$output .="<a class='btn btn-danger btn-sm' role='button' href='javascript:leaderRemove(\"".$row['eventleaderID']."\",\"$leaderName\")''><span class='bi bi-eraser'></span> Remove</a>";
 		}
-		$output .="<div>Grade: ".getStudentGrade($row['yearGraduating'], $year)." (".$row['yearGraduating'].")</div>";
+		$output .="<div>Grade: ".getStudentGrade($row['yearGraduating'])." (".$row['yearGraduating'].")</div>";
 		if($row['email'])
 		{
-			$output .="<div>Email: <a href='mailto:".$row['email']."'>".$row['email']."</a></div>";
+			$output .="<div>Google Email:".$row['email']."</div>";
 		}
 		if($row['emailSchool'])
 		{
-			$output .="<div>School Email: <a href='mailto:".$row['emailSchool']."'>".$row['emailSchool']."</a></div>";
+			$output .="<div>School Email:".$row['emailSchool']."</div>";
 		}
 		if($row['phone'])
 		{

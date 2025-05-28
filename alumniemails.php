@@ -3,8 +3,9 @@ header("Content-Type: text/plain");
 require_once  ("php/functions.php");
 
 userCheckPrivilege(3);
+$schoolID = $_SESSION['userData']['schoolID'];
 $year = getCurrentSOYear();
-$studentID = getStudentID($_SESSION['userData']['userID']);
+$studentID = getStudentID($mysqlConn, $_SESSION['userData']['userID']);
 $studentIDWhere = "";
 if($studentID)
 {
@@ -32,7 +33,7 @@ while ($row = $result->fetch_assoc()) {
 		$output .="<tr><td>".$row['yearGraduating']."</td>";
 	}
     $output .= "<td>" . $row["first"] . " " . $row["last"] . "</td>";
-    $output .= "<td><a href='mailto:".$row['email']."'>".$row['email']."</a></td>";
+    $output .= "<td><a href='mailto: ".$row['email']."'>".$row['email']."</a></td>";
     $output .= "</tr>";
 
     $emails[] = $row['email'];
@@ -42,7 +43,7 @@ while ($row = $result->fetch_assoc()) {
 if(userHasPrivilege(3))
 {
     $output.="<tr>";
-	$emailList = implode(';', array_filter($emails)); //array_filter removes null values
+	$emailList = implode(';', $emails);
 }
 echo $output;
 ?>

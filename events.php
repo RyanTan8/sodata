@@ -1,7 +1,6 @@
 <?php
 require_once ("php/functions.php");
 userCheckPrivilege(1);
-$schoolID = $_SESSION['userData']['schoolID'];
 ?>
 <div>
 <button class="btn btn-secondary" type="button" onclick="javascript:toggleSearch()"><span class='bi bi-search'></span> Find</button> <!-- toggles view of below div -->
@@ -15,7 +14,7 @@ $schoolID = $_SESSION['userData']['schoolID'];
 				<?=getSOYears("",1)?>
 			</p>
 			<p>
-				<?=getDivisionList(1)?>
+				<?=getDivisionList($mysqlConn,1)?>
 			</p>
 			<p>
 				<button id="searchDbBtn" class="btn btn-primary" type="submit"><span class='bi bi-binoculars'></span> Search</button>
@@ -35,12 +34,6 @@ $schoolID = $_SESSION['userData']['schoolID'];
 	</form>
 	<a class='btn btn-secondary' role='button' href='#eventyear-edit-<?=getCurrentSOYear();?>'><span class='bi bi-pencil-square'></span> Edit Year</a>
 	<a class='btn btn-secondary' role='button' href='#events-analysis-<?=getCurrentSOYear();?>'><span class='bi bi-pie-chart'></span> Analysis</a>
-	
-<?php 
-	} 
-	if(userHasPrivilege(2)) {
-?>
-	<a class='btn btn-primary' role='button' href='#attendance'><span class='bi bi-people-fill'></span> Attendance</a>
 <?php } ?>
 
 <div id="list"></div>

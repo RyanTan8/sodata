@@ -42,7 +42,7 @@
 		endwhile;
 	}
 
-	$privilegeText = editPrivilege(4,$row['userID']);
+	$privilegeText = editPrivilege(4,$row['userID'],$mysqlConn);
 ?>
 <form id="addTo" method="post" action="fieldUpdate.php">
 		<fieldset>
@@ -64,4 +64,4 @@
 			</select>
 		</div>
 	</div>
-	<?=getCourseList()?>
+	<?=getCourseList($mysqlConn)?>

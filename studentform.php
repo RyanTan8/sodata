@@ -2,6 +2,7 @@
 require_once  ("php/functions.php");
 userCheckPrivilege(2);
 $studentID = 1; //TODO: CHange me
+$schoolID = $_SESSION['userData']['schoolID'];
 
 $editing = true;
 if(!isset($row))
@@ -10,7 +11,7 @@ if(!isset($row))
 	$row = NULL;
 }
 ?>
-<h3><?=getCurrentSchoolName($schoolID)?></h3>
+<h3><?=getCurrentSchoolName($mysqlConn, $schoolID)?></h3>
 <?php
 if ($editing)
 {
@@ -36,6 +37,19 @@ if ($editing)
 	<label for="last">Lastname</label>
 	<input id="last" name="last" class="form-control" type="text" value="<?=$row['last']?>" required>
 </p>
+<?php
+if (userHasPrivilege(4))
+{
+	?>
+	<p>
+		<input id="paidDues" name="paidDues" class="form-check-input" type="checkbox" <?=$row['paidDues']==1?"checked":""?>><label for="paidDues">Dues Paid</label>
+
+		<label for="paidDuesDate">on Date</label>
+		<input id="paidDuesDate" name="paidDuesDate" class="form-control" type="date" value="<?=$row['paidDuesDate']?>">
+	</p>
+	<?php
+}
+?>
 <p>
 	<label for="yearGraduating">Year Graduating</label>
 	<input id="yearGraduating" name="yearGraduating" class="form-control" type="text" min="1982" value="<?=$row['yearGraduating']?>" required>
@@ -79,19 +93,15 @@ if ($editing)
 	</fieldset>
 	<fieldset>
 		<legend>Courses Completed</legend>
-		<div id="coursecompleted"><?= getCourses($row['studentID'], "coursecompleted")?></div>
+		<div id="coursecompleted"><?= getCourses($mysqlConn, $row['studentID'], "coursecompleted")?></div>
 		<div id="addcoursecompletedDiv"></div>
 		<a id="addcoursecompleted" class="addCourseBtn" href="javascript:studentCourseAddChoice('<?=$row['studentID']?>','coursecompleted')">Add Course Completed</a>
 	</fieldset>
 	<fieldset>
 		<legend>Courses Enrolled (but not completed)</legend>
-		<div id="courseenrolled"><?= getCourses($row['studentID'], "courseenrolled")?></div>
+		<div id="courseenrolled"><?= getCourses($mysqlConn, $row['studentID'], "courseenrolled")?></div>
 		<div id="addcourseenrolledDiv"></div>
 		<a id="addcourseenrolled" class="addCourseBtn" href="javascript:studentCourseAddChoice('<?=$row['studentID']?>','courseenrolled')">Add Course Enrolled</a>
-	</fieldset>
-	<fieldset>
-		<legend>Awards</legend>
-		<div id="awards"><?= getAwards($row['studentID'])?></div>
 	</fieldset>
 	<?php
 }?>

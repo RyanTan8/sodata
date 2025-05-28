@@ -80,8 +80,11 @@ userCheckPrivilege(1);
 	<meta name="description" content="Walton Science Olympiad Homepage" />
 	<meta name="keywords" content="Walton, Science, Olympiad, SO" />
 	<!--[if lte IE 8]><script src="js/html5shiv.js"></script><![endif]-->
-	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-	
+	<script src="js/jquery-3.6.0.min.js"></script>
+	<!--
+	<script src="js/jquery.validate.min.js"></script>
+	<script src="js/additional-methods.min.js"></script> <!--Additional Methods are also for jquery validate-->
+
 	<!--<script src="js/jquery.modal.min.js"></script> Modal plugin https://github.com/kylefox/jquery-modal-->
 	<link rel="stylesheet" href="css/wolfestyle.css" />
 
@@ -90,13 +93,10 @@ userCheckPrivilege(1);
 	<script src="js/data.js"></script>
 	<script src="js/teampropose.js"></script>
 
-	<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.css" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote.min.js"></script>
-
 	<!-- Add the slick-theme.css if you want default styling -->
-	<!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>-->
+	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
 	<!-- Add the slick-theme.css if you want default styling -->
-	<!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>-->
+	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
 
 	<link rel="shortcut icon" href="images/waltoncthulu32.png">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -189,7 +189,7 @@ userCheckPrivilege(1);
 	<!-- Modal -->
 
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-	<!--<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>!-->
+	<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
 </body>
 </html>

@@ -25,7 +25,7 @@ if(!$row)
 	echo "No user found.";
 	exit;
 }
-$privilegeText = editPrivilege(4,$row['userID']);
+$privilegeText = editPrivilege(4,$row['userID'],$mysqlConn);
 ?>
 <form id="studentUpdate" method="post" action="studentUpdate.php">
 		<fieldset>

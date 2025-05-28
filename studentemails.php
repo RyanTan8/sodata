@@ -1,11 +1,12 @@
 <?php
 header("Content-Type: text/plain");
 require_once  ("php/functions.php");
-userCheckPrivilege(3);
 
+userCheckPrivilege(3);
+$schoolID = $_SESSION['userData']['schoolID'];
 $eventID = intval($_POST['myID']);
 $year = getCurrentSOYear();
-$studentID = getStudentID($_SESSION['userData']['userID']);
+$studentID = getStudentID($mysqlConn, $_SESSION['userData']['userID']);
 $studentIDWhere = "";
 
 if($studentID)
@@ -29,8 +30,8 @@ $output .= "<thead class='table-dark'><tr><th>Name</th><th>Email</th><th>School 
 while ($row = $result->fetch_assoc()) {
     $output .= "<tr>";
     $output .= "<td>" . $row["first"] . " " . $row["last"] . "</td>";
-    $output .= "<td><a href='mailto:".$row['email']."'>".$row['email']."</a></td>";
-    $output .= "<td><a href='mailto:".$row['emailSchool']."'>".$row['emailSchool']."</a></td>";
+    $output .= "<td><a href='mailto: ".$row['email']."'>".$row['email']."</a></td>";
+    $output .= "<td><a href='mailto: ".$row['emailSchool']."'>".$row['emailSchool']."</a></td>";
     $output .= "</tr>";
 
     $emails[] = $row['email'];
@@ -40,8 +41,8 @@ if(userHasPrivilege(3))
 {
     $output.="<tr>";
 	$output.="<td>Total</td>";
-	$emailList = implode(';', array_filter($emails)); //array_filter removes null values
-	$schoolEmailList= implode(';', array_filter($schoolEmails)); //array_filter removes null values
+	$emailList = implode(';', $emails);
+	$schoolEmailList= implode(';', $schoolEmails);
     // Replace links with buttons to copy to clipboard
 
 	// $output.="<td><a href='mailto:$emailList'>Personal Emails</a>, <a href='mailto:$schoolEmailList'>School Emails</a>, <a href='mailto:$emailList;$schoolEmailList'>All Emails</a></td>";

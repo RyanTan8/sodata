@@ -1,6 +1,7 @@
 <?php
 require_once  ("php/functions.php");
 userCheckPrivilege(2);
+$schoolID = $_SESSION['userData']['schoolID'];
 /*Warnings for senior count and team cound is all handled in javascript
 	*count number of students
 	*count number of seniors
@@ -8,20 +9,18 @@ userCheckPrivilege(2);
 	*Error if over 15 students OR over 7 seniors
 */
 
-function assignedToTeam($teamID, $studentID)
+function assignedToTeam($db, $teamID, $studentID)
 {
-	global $mysqlConn;
 	//$query = "SELECT * FROM `teammate` INNER JOIN `team` ON `teammate`.`teamID`=`team`.`teamID` WHERE `teammate`.`teamID` = $teamID";
 	$query = "SELECT * FROM `teammate` WHERE `teamID` =  $teamID AND `studentID` = $studentID" ;
-	$result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
+	$result = $db->query($query) or error_log("\n<br />Warning: query failed:$query. " . $db->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 	return mysqli_num_rows($result);
 }
-function assignedToOtherTeam($tournamentID, $studentID)
+function assignedToOtherTeam($db, $tournamentID, $studentID)
 {
-	global $mysqlConn;
 	//$query = "SELECT * FROM `teammate` INNER JOIN `team` ON `teammate`.`teamID`=`team`.`teamID` WHERE `teammate`.`teamID` = $teamID";
 	$query = "SELECT * FROM `teammate` INNER JOIN `team` ON `teammate`.`teamID`=`team`.`teamID` WHERE `team`.`tournamentID` =  $tournamentID AND `studentID` = $studentID" ;
-	$result = $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
+	$result = $db->query($query) or error_log("\n<br />Warning: query failed:$query. " . $db->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 	$row = $result->fetch_assoc();
 	if(empty($row))
 	{
@@ -56,22 +55,19 @@ if($resultStudent){
 		//$query = "SELECT * FROM `teammate` WHERE `teamID` =  $teamID AND `studentID` = ".$rowStudent['studentID'] ;
 		//$resultTeammate= $mysqlConn->query($query) or error_log("\n<br />Warning: query failed:$query. " . $mysqlConn->error. ". At file:". __FILE__ ." by " . $_SERVER['REMOTE_ADDR'] .".");
 		//if there is a result then make box checked, if not do not check box.
-		$checked = assignedToTeam($teamID, $rowStudent['studentID'])?" checked ":"";
+		$checked = assignedToTeam($mysqlConn, $teamID, $rowStudent['studentID'])?" checked ":"";
 		$assigned = "";
 		$disabled = "";
 		if (!$checked)
 		{
-			$assigned = assignedToOtherTeam($tournamentID, $rowStudent['studentID']);
+			$assigned = assignedToOtherTeam($mysqlConn, $tournamentID, $rowStudent['studentID']);
 			if($assigned)
 			{
 				$disabled = " disabled='disabled' ";
 			}
 		}
 		$hidden = $rowStudent['active']?"":"class='inactive' style='display: none;'";
-		$studentGrade = getStudentGrade($rowStudent['yearGraduating'], $row['year']);
-		$studentList .= "<div $hidden class='scioly'><input type='checkbox' data-studentgrade='$studentGrade'
-		 onchange='javascript:tournamentTeammate($(this))' id='$checkbox' name='$checkbox' value='' $checked $disabled><label for='$checkbox'>
-		<a target='_blank' href='#student-details-".$rowStudent['studentID']."'>".$rowStudent['last'].", " . $rowStudent['first'] ." - $studentGrade</a> $assigned</label></div>";
+		$studentList .= "<div $hidden class='scioly'><input type='checkbox' data-studentgrade='".getStudentGrade($rowStudent['yearGraduating'])."' onchange='javascript:tournamentTeammate($(this))' id='$checkbox' name='$checkbox' value='' $checked $disabled><label for='$checkbox'><a target='_blank' href='#student-details-".$rowStudent['studentID']."'>".$rowStudent['last'].", " . $rowStudent['first'] ." - " . getStudentGrade($rowStudent['yearGraduating']) ."</a> $assigned</label></div>";
 	endwhile;
 }
 ?>
@@ -84,7 +80,7 @@ if($resultStudent){
 	</p>
 	<?php 
 	
-	if (!$row['notCompetition'] && $row["dateTournament"]<=getCurrentTimestamp())
+	if (!$row['notCompetition'] && $row["dateTournament"]<=getCurrentTimestamp($mysqlConn))
 	{
 
 	?>
@@ -95,7 +91,7 @@ if($resultStudent){
 	<?php } ?>
 
 	<p id="tournamentTeamp">
-			<?=getTeamList($tournamentID, "Select Students from a Previous Tournament")?>
+			<?=getTeamList($mysqlConn, $schoolID, $tournamentID, "Select Students from a Previous Tournament")?>
 		<input class="btn btn-primary" role="button" type="button" onclick="javascript:teamCopy(<?=$teamID?>)" value="Copy Team" />
 	</p>
 

@@ -11,6 +11,7 @@ $table = $mysqlConn->real_escape_string($_POST['mytable']);
 $field = $mysqlConn->real_escape_string($_POST['myfield']);
 $value = $mysqlConn->real_escape_string($_POST['myvalue']);
 
+
 //special cases for times
 if($field=="timeStart" || $field=="timeEnd")
 {
